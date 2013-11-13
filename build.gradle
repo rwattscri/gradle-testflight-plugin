@@ -1,0 +1,92 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+// This artifacts coordinates are:
+//      groupId:    com.willowtreeapps.gradle.plugins
+//      artifactId: gradle-testflight-plugin
+
+version = '1.0'
+
+dependencies {
+    compile gradleApi()
+    groovy localGroovy()
+
+    compile 'org.apache.httpcomponents:httpcore:4.2.1'
+    compile 'org.apache.httpcomponents:httpmime:4.2.1'
+    compile 'org.apache.httpcomponents:fluent-hc:4.2.1'
+    compile 'org.apache.httpcomponents:httpclient-cache:4.2.1'
+    compile 'commons-httpclient:commons-httpclient:3.1'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name 'wtaInternal'
+        credentials {
+            username archivaUsername
+            password archivaPassword
+        }
+        url archivaInternalUrl
+    }
+
+    maven {
+        name 'wtaSnapshot'
+        credentials {
+            username archivaUsername
+            password archivaPassword
+        }
+        url archivaSnapshotsUrl
+    }
+}
+
+//buildscript{
+//    repositories {
+//        mavenCentral()
+//
+//        maven {
+//            name 'wtaInternal'
+//            credentials {
+//                username archivaUsername
+//                password archivaPassword
+//            }
+//            url archivaInternalUrl
+//        }
+//
+//        maven {
+//            name 'wtaSnapshot'
+//            credentials {
+//                username archivaUsername
+//                password archivaPassword
+//            }
+//            url archivaSnapshotsUrl
+//        }
+//    }
+//
+//    dependencies {
+//        compile 'org.apache.httpcomponents:httpcore:4.2.1'
+//        compile 'org.apache.httpcomponents:httpmime:4.2.1'
+//        compile 'org.apache.httpcomponents:fluent-hc:4.2.1'
+//        compile 'org.apache.httpcomponents:httpclient-cache:4.2.1'
+//        compile 'commons-httpclient:commons-httpclient:3.1'
+//        compile 'com.googlecode.json-simple:json-simple:1.1.1'
+//    }
+//}
+
+
+//task distribution << {
+//    println "We build the zip with version=$version"
+//}
+//
+//task release(dependsOn: 'distribution') << {
+//    println 'We release now'
+//}
+//
+//gradle.taskGraph.whenReady {taskGraph ->
+//    if (taskGraph.hasTask(release)) {
+//        version = '1.0'
+//    } else {
+//        version = '1.0-SNAPSHOT'
+//    }
+//}
