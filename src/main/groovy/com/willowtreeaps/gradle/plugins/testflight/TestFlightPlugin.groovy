@@ -35,7 +35,6 @@ class TestFlightPlugin implements Plugin<Project> {
                 }
             } catch (Exception e) {
                 String err = "There was an error executing the TestFlight upload task in the gradle-testflight-plugin."
-                println(err, e)
                 throw new GradleException(err, e)
             }
 
