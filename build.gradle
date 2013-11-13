@@ -1,5 +1,4 @@
 apply plugin: 'groovy'
-apply plugin: 'maven'
 
 // This artifacts coordinates are:
 //      groupId:    com.willowtreeapps.gradle.plugins
@@ -21,22 +20,4 @@ dependencies {
 
 repositories {
     mavenCentral()
-
-    maven {
-        name 'wtaInternal'
-        credentials {
-            username archivaUsername
-            password archivaPassword
-        }
-        url archivaInternalUrl
-    }
-
-    maven {
-        name 'wtaSnapshot'
-        credentials {
-            username archivaUsername
-            password archivaPassword
-        }
-        url archivaSnapshotsUrl
-    }
 }

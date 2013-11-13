@@ -56,12 +56,12 @@ class TestFlightPluginExtension {
     }
 
     TestFlightTarget getTargetParams() {
-        return targets.find {it ->
+        return targets.find { it ->
             it.name.equalsIgnoreCase(currentTarget)
         }
     }
 
-    def targets(Closure closure){
+    def targets(Closure closure) {
         targets.configure(closure)
     }
 }
