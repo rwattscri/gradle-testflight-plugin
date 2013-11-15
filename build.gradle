@@ -78,34 +78,20 @@ signing {
 task validateSigned << {
     // Prove a jar has been signed with the gpg tool.
 
-    def gpgHome = "$System.env.GPG_HOME"
+
     def artifactsRepoPath = "${localMavenRepo}/${ project.groupId.replace('.', '/')}/${archivesBaseName}/${version}/"
 
-    def jarAsc = "${artifactsRepoPath}${archivesBaseName}-${version}.jar.asc"
+    validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}.jar.asc")
+    validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}.pom.asc")
+    validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}-sources.jar.asc")
+    validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}-javadoc.jar.asc")
+}
+
+def validateSignedArtifact(String artifact){
+    def gpgHome = "$System.env.GPG_HOME"
     def output = project.exec {
         executable = new File(gpgHome, 'gpg')
-        args jarAsc
-    }
-    assert output.exitValue == 0
-
-    def pomAsc = "${artifactsRepoPath}${archivesBaseName}-${version}.pom.asc"
-    output = project.exec {
-        executable = new File(gpgHome, 'gpg')
-        args pomAsc
-    }
-    assert output.exitValue == 0
-
-    def sourcesAsc = "${artifactsRepoPath}${archivesBaseName}-${version}-sources.jar.asc"
-    output = project.exec {
-        executable = new File(gpgHome, 'gpg')
-        args sourcesAsc
-    }
-    assert output.exitValue == 0
-
-    def javadocAsc = "${artifactsRepoPath}${archivesBaseName}-${version}-javadoc.jar.asc"
-    output = project.exec {
-        executable = new File(gpgHome, 'gpg')
-        args javadocAsc
+        args artifact
     }
     assert output.exitValue == 0
 }
