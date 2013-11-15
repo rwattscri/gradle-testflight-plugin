@@ -1,10 +1,27 @@
-apply plugin: 'groovy'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies{
+        classpath 'com.github.townsfolk:gradle-release:1.2'
+    }
+}
 
-// This artifacts coordinates are:
-//      groupId:    com.willowtreeapps.gradle.plugins
-//      artifactId: gradle-testflight-plugin
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'signing'
+apply plugin: 'release'
+
+
+// Define custom properties using the project extension.
+project.ext {
+    groupId = 'com.willowtreeapps.gradle.plugins'
+    artifactId = 'gradle-testflight-plugin'
+    isReleaseVersion = !version.endsWith("SNAPSHOT")
+}
 
 version = '1.0'
+
 
 dependencies {
     compile gradleApi()
@@ -20,4 +37,158 @@ dependencies {
 
 repositories {
     mavenCentral()
+}
+
+task makePom << {
+    pom {
+        project{
+            pomConfiguration
+        }
+    }.writeTo("$buildDir/pom.xml")
+}
+
+task bundleSources(type: Jar) {
+    description = 'gradle-testflight-plugin source code.'
+    classifier = 'sources'
+    from sourceSets.main.groovy
+}
+
+task bundleDocs(type: Jar) {
+    // TODO: Document the classes, methods, and properties.
+
+    title = 'gradle-testflight-plugin docs'
+    description = 'gradle-testflight-plugin groovy docs.'
+    classifier = 'javadoc'
+    from groovydoc
+}
+
+
+// artifacts: Configures the published artifacts for this project.
+artifacts {
+    // The archives task defines the artifacts we want additionally published.
+    archives bundleDocs, bundleSources
+}
+
+// $ gradle signArchives
+signing {
+    sign configurations.archives
+}
+
+// Optional task to prove the signing plugin did its pgp work.
+task validateSigned << {
+    // Prove a jar has been signed with the gpg tool.
+
+    def gpgHome = "$System.env.GPG_HOME"
+    def artifactsRepoPath = "${localMavenRepo}/${ project.groupId.replace('.', '/')}/${archivesBaseName}/${version}/"
+
+    def jarAsc = "${artifactsRepoPath}${archivesBaseName}-${version}.jar.asc"
+    def output = project.exec {
+        executable = new File(gpgHome, 'gpg')
+        args jarAsc
+    }
+    assert output.exitValue == 0
+
+    def pomAsc = "${artifactsRepoPath}${archivesBaseName}-${version}.pom.asc"
+    output = project.exec {
+        executable = new File(gpgHome, 'gpg')
+        args pomAsc
+    }
+    assert output.exitValue == 0
+
+    def sourcesAsc = "${artifactsRepoPath}${archivesBaseName}-${version}-sources.jar.asc"
+    output = project.exec {
+        executable = new File(gpgHome, 'gpg')
+        args sourcesAsc
+    }
+    assert output.exitValue == 0
+
+    def javadocAsc = "${artifactsRepoPath}${archivesBaseName}-${version}-javadoc.jar.asc"
+    output = project.exec {
+        executable = new File(gpgHome, 'gpg')
+        args javadocAsc
+    }
+    assert output.exitValue == 0
+}
+
+release {
+    // Creates the release tag in github.
+    createReleaseTag.dependsOn uploadArchives
+}
+
+// Only sign if we are uploading the archive to a repository and it is a release version.
+gradle.taskGraph.whenReady { taskGraph ->
+    tasks.withType(org.gradle.plugins.signing.Sign).all {
+        required = taskGraph.hasTask(":uploadArchives") && isReleaseVersion
+    }
+}
+
+install.repositories.mavenInstaller {
+    pom.project(pomConfiguration)
+    if (signing.signatory) {
+        beforeDeployment { signing.signPom(it) }
+    }
+}
+
+
+// $ gradle assemble signArchives uploadArchives
+
+uploadArchives {
+//    repositories.mavenDeployer {
+//        if (signing.signatory) {
+//            beforeDeployment { signPom(it) }
+//        }
+//        name = 'mavenCentralReleaseDeployer'
+//        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+//            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
+//            releases(updatePolicy: 'always')
+//            snapshots(updatePolicy: 'always')
+//        }
+//        pom.project(pomConfiguration)
+//    }
+
+    // Practice signing and deploying to the local maven repo.
+    repositories.mavenDeployer {
+        name = 'localRepoDeployer'
+        repository(url: "file://${localMavenRepo}")
+        pom.project(pomConfiguration)
+    }
+}
+
+def getPomConfiguration(){
+    return {
+        groupId project.groupId
+        artifactId project.artifactId
+        version project.version
+        packaging 'jar'
+        name 'Gradle TestFlight Plugin'
+        description 'Use this plugin to publish an Android or iOS mobile application to TestFlight. Create an account at https://testflightapp.com to get started.'
+        url 'https://github.com/willowtreeapps/gradle-testflight-plugin'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        scm {
+            url 'https://github.com/willowtreeapps/gradle-testflight-plugin'
+            connection 'scm:git:git@github.com:willowtreeapps/gradle-testflight-plugin.git'
+            developerConnection 'scm:git:git@github.com:willowtreeapps/gradle-testflight-plugin.git'
+        }
+        organization {
+            name 'WillowTree Apps, Inc.'
+            url 'http://www.willowtreeapps.com/'
+        }
+        developers {
+            developer {
+                name 'Andrew Shannon'
+                email 'andrew.shannon@willowtreeapps.com'
+            }
+        }
+        issueManagement {
+            system 'github'
+            url 'https://github.com/willowtreeapps/gradle-testflight-plugin/issues'
+        }
+        inceptionYear '2013'
+    }
 }
