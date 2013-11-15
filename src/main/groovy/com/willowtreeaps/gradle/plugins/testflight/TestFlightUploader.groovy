@@ -9,6 +9,11 @@ import org.apache.http.entity.mime.content.FileBody
 import org.apache.http.entity.mime.content.StringBody
 import org.apache.http.impl.client.DefaultHttpClient
 
+/**
+ * This class does the work of posting to the TestFlight API.
+ * Note that the response is not used for anything other than
+ * determining if the mobile artifact was successfully posted.
+ */
 class TestFlightUploader {
     private static final String HOST = 'testflightapp.com'
 
@@ -54,12 +59,18 @@ class TestFlightUploader {
     }
 }
 
+/**
+ * Pogo that defines the params needed to perform a TestFlight post.
+ */
 class UploadRequest {
     String apiToken, teamToken, buildNotes, distributionLists
     File file
     boolean notifyDistributionList
 }
 
+/**
+ * Pogo that returns the basic response results information back to the caller.
+ */
 class UploadResult {
     boolean succeeded
     String message

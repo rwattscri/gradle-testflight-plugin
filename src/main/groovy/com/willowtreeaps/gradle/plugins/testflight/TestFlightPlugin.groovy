@@ -5,6 +5,10 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+/**
+ * The short name for this plugin is "testFlight".  It contains one task programmed directly
+ * into the apply method.  The task's name is: testFlightConfig
+ */
 class TestFlightPlugin implements Plugin<Project> {
     void apply(Project project) {
 
@@ -47,6 +51,16 @@ class TestFlightPlugin implements Plugin<Project> {
     }
 }
 
+/**
+ * This class provides the hook to create multiple TestFlight targets
+ * in your build file.  The 'currentTarget' property is required and
+ * is used as the default value if it is not otherwise set via some
+ * other property you choose to pass in to your build.
+ *
+ * The 'currentTarget' value will be compared (case insensitive) to the
+ * name value in a TestFlightTarget in order to choose which target
+ * to which your mobile artifact will be posted.
+ */
 class TestFlightPluginExtension {
     String currentTarget
     final NamedDomainObjectContainer<TestFlightTarget> targets
@@ -66,6 +80,9 @@ class TestFlightPluginExtension {
     }
 }
 
+/**
+ * This class defines the properties for your TestFlight configurations.
+ */
 class TestFlightTarget {
     //  The object must have a "name" field in order for the NamedDomainObjectContainer to work.
     String name
