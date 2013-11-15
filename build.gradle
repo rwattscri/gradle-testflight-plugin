@@ -114,16 +114,10 @@ uploadArchives {
             beforeDeployment { signPom(it) }
         }
         name = 'sonatypeDeployer'
-        if (isReleaseVersion) {
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-                authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
-                releases(updatePolicy: 'always')
-            }
-        } else {
-            repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: sonatypeUsername, password: sonatypeUsername)
-                snapshots(updatePolicy: 'always')
-            }
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
+            releases(updatePolicy: 'always')
+            snapshots(updatePolicy: 'always')
         }
         pom.project(pomConfiguration)
     }
