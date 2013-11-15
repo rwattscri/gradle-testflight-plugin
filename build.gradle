@@ -20,7 +20,7 @@ project.ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 
-version = '1.0'
+version = '0.1-SNAPSHOT'
 
 
 dependencies {
@@ -62,8 +62,6 @@ task bundleDocs(type: Jar) {
     from groovydoc
 }
 
-
-// artifacts: Configures the published artifacts for this project.
 artifacts {
     // The archives task defines the artifacts we want additionally published.
     archives bundleDocs, bundleSources
@@ -76,11 +74,7 @@ signing {
 
 // Optional task to prove the signing plugin did its pgp work.
 task validateSigned << {
-    // Prove a jar has been signed with the gpg tool.
-
-
     def artifactsRepoPath = "${localMavenRepo}/${ project.groupId.replace('.', '/')}/${archivesBaseName}/${version}/"
-
     validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}.jar.asc")
     validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}.pom.asc")
     validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}-sources.jar.asc")
@@ -116,6 +110,7 @@ install.repositories.mavenInstaller {
 }
 
 
+// $ gradle assemble signArchives release
 // $ gradle assemble signArchives uploadArchives
 
 uploadArchives {
