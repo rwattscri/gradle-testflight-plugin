@@ -20,7 +20,8 @@ project.ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 
-version = '0.1-SNAPSHOT'
+// The version value is read from the local gradle.properties file!
+// version = do not use this property in the build file
 
 
 dependencies {
@@ -55,8 +56,6 @@ task bundleSources(type: Jar) {
 
 task bundleDocs(type: Jar) {
     // TODO: Document the classes, methods, and properties.
-
-    title = 'gradle-testflight-plugin docs'
     description = 'gradle-testflight-plugin groovy docs.'
     classifier = 'javadoc'
     from groovydoc
@@ -72,7 +71,7 @@ signing {
     sign configurations.archives
 }
 
-// Optional task to prove the signing plugin did its pgp work.
+// Optional task to prove the signing plugin did its pgp work.  In this case we are testing against the local repo.
 task validateSigned << {
     def artifactsRepoPath = "${localMavenRepo}/${ project.groupId.replace('.', '/')}/${archivesBaseName}/${version}/"
     validateSignedArtifact("${artifactsRepoPath}${archivesBaseName}-${version}.jar.asc")
@@ -110,8 +109,9 @@ install.repositories.mavenInstaller {
 }
 
 
+
+// $ gradle assemble signArchives uploadArchives  (no release)
 // $ gradle assemble signArchives release
-// $ gradle assemble signArchives uploadArchives
 
 uploadArchives {
 //    repositories.mavenDeployer {
