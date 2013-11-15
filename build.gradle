@@ -23,7 +23,6 @@ project.ext {
 // The version value is read from the local gradle.properties file!
 // version = do not use this property in the build file
 
-
 dependencies {
     compile gradleApi()
     groovy localGroovy()
@@ -114,25 +113,24 @@ install.repositories.mavenInstaller {
 // $ gradle assemble signArchives release
 
 uploadArchives {
-//    repositories.mavenDeployer {
-//        if (signing.signatory) {
-//            beforeDeployment { signPom(it) }
-//        }
-//        name = 'mavenCentralReleaseDeployer'
-//        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-//            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
-//            releases(updatePolicy: 'always')
-//            snapshots(updatePolicy: 'always')
-//        }
-//        pom.project(pomConfiguration)
-//    }
-
-    // Practice signing and deploying to the local maven repo.
     repositories.mavenDeployer {
-        name = 'localRepoDeployer'
-        repository(url: "file://${localMavenRepo}")
+        if (signing.signatory) {
+            beforeDeployment { signPom(it) }
+        }
+        name = 'sonatypeDeployer'
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
+            releases(updatePolicy: 'always')
+        }
         pom.project(pomConfiguration)
     }
+
+//    Practice signing and deploying to the local maven repo.
+//    repositories.mavenDeployer {
+//        name = 'localRepoDeployer'
+//        repository(url: "file://${localMavenRepo}")
+//        pom.project(pomConfiguration)
+//    }
 }
 
 def getPomConfiguration(){
