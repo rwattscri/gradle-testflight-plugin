@@ -121,7 +121,7 @@ uploadArchives {
             }
         } else {
             repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: repositoryUsername, password: repositoryPassword)
+                authentication(userName: sonatypeUsername, password: sonatypeUsername)
                 snapshots(updatePolicy: 'always')
             }
         }
