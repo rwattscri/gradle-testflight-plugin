@@ -101,7 +101,9 @@ gradle.taskGraph.whenReady { taskGraph ->
 install.repositories.mavenInstaller {
     pom.project(pomConfiguration)
     if (signing.signatory) {
-        beforeDeployment { signing.signPom(it) }
+        beforeDeployment {
+            signing.signPom(it)
+        }
     }
 }
 
@@ -115,7 +117,7 @@ uploadArchives {
         }
         name = 'sonatypeDeployer'
         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-            authentication(userName: System.properties['sonatypeUsername'], password: System.properties['sonatypePassword'])
+            authentication(userName: sonatypeUsername, password: sonatypePassword)
             releases(updatePolicy: 'always')
             snapshots(updatePolicy: 'always')
         }
