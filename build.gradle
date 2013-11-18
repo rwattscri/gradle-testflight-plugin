@@ -134,6 +134,7 @@ uploadArchives {
 
 def getPomConfiguration() {
     return {
+        modelVersion '4.0.0'
         groupId project.groupId
         artifactId project.artifactId
         version project.version
