@@ -40,7 +40,7 @@ class TestFlightUploader {
         entity.addPart('notify', new StringBody(ur.notifyDistributionList && ur.distributionLists ? 'True' : 'False'))
 
         // Note we are hard coding this to always replace the app in test flight.
-        entity.addPart('replace', new StringBody(Boolean.toString(ur.replace)))
+        entity.addPart('replace', new StringBody(ur.replace ? 'True' : 'False'))
         httpPost.setEntity(entity)
 
         HttpResponse response = httpClient.execute(targetHost, httpPost)
