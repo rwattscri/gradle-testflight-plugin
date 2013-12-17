@@ -93,7 +93,7 @@ class TestFlightTarget {
     boolean testFlightNotifyDistroList
     String testFlightBuildNotes
     String filePath
-    boolean testFlightReplace
+    boolean testFlightReplace = true
 
     UploadRequest request() {
         return new UploadRequest(apiToken: testFlightApiToken,
