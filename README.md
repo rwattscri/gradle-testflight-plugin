@@ -84,6 +84,7 @@ gradle-testflight-plugin
                 testFlightDistroList = 'Internal'
                 testFlightNotifyDistroList = false
                 testFlightBuildNotes = notes
+                testFlightReplace = true // defaults to true
                 filePath = getApkPath(true)
             }
 
@@ -93,6 +94,7 @@ gradle-testflight-plugin
                 testFlightDistroList = externalDistroList
                 testFlightNotifyDistroList = true
                 testFlightBuildNotes = 'Release notes you want to share with your client.'
+                testFlightReplace = true // defaults to true
                 filePath = getApkPath(true)
             }
         }
