@@ -20,42 +20,49 @@ class TestFlightUploader {
     private static final String POST = '/api/builds.json'
 
     public UploadResult upload(UploadRequest ur) {
+        String errors = ""
 
         DefaultHttpClient httpClient = new DefaultHttpClient()
 
         HttpHost targetHost = new HttpHost(HOST)
-        HttpPost httpPost = new HttpPost(POST)
-        FileBody fileBody = new FileBody(ur.file)
-
         MultipartEntity entity = new MultipartEntity()
         entity.addPart('api_token', new StringBody(ur.apiToken))
         entity.addPart('team_token', new StringBody(ur.teamToken))
         entity.addPart('notes', new StringBody(ur.buildNotes))
-        entity.addPart('file', fileBody)
-
         if (ur.distributionLists) {
             entity.addPart('distribution_lists', new StringBody(ur.distributionLists))
         }
-
         entity.addPart('notify', new StringBody(ur.notifyDistributionList && ur.distributionLists ? 'True' : 'False'))
 
         // Note we are hard coding this to always replace the app in test flight.
         entity.addPart('replace', new StringBody(ur.replace ? 'True' : 'False'))
-        httpPost.setEntity(entity)
 
-        HttpResponse response = httpClient.execute(targetHost, httpPost)
-        HttpEntity resEntity = response.getEntity()
+        ur.filePaths.each{filePath ->
+            HttpPost httpPost = new HttpPost(POST)
 
-        InputStream is = resEntity.getContent()
+            FileBody fileBody = new FileBody(new File(filePath))
+            entity.addPart('file', fileBody)
 
-        int statusCode = response.getStatusLine().getStatusCode()
+            httpPost.setEntity(entity)
 
-        if (statusCode != 200 && statusCode != 201) {
-            String responseBody = new Scanner(is).useDelimiter('\\A').next()
-            return new UploadResult(succeeded: false, message: responseBody)
+            HttpResponse response = httpClient.execute(targetHost, httpPost)
+            HttpEntity resEntity = response.getEntity()
+
+            InputStream is = resEntity.getContent()
+
+            int statusCode = response.getStatusLine().getStatusCode()
+
+            if (statusCode != 200 && statusCode != 201) {
+                String responseBody = new Scanner(is).useDelimiter('\\A').next()
+                errors += responseBody + "\n\r"
+            }
+
+            httpPost.releaseConnection()
+
         }
 
-        return new UploadResult(succeeded: true, message: 'The TestFlight upload was successful.')
+        return new UploadResult(succeeded: errors.length() == 0,
+                message: errors.length() == 0 ? 'The TestFlight upload was successful.' : errors)
     }
 }
 
@@ -64,7 +71,7 @@ class TestFlightUploader {
  */
 class UploadRequest {
     String apiToken, teamToken, buildNotes, distributionLists
-    File file
+    List<String> filePaths
     boolean notifyDistributionList, replace
 }
 

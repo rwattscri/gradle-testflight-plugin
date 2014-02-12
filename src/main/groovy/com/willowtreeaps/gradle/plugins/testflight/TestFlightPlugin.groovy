@@ -30,7 +30,7 @@ class TestFlightPlugin implements Plugin<Project> {
             println("Distro list: ${currentParams.testFlightDistroList}")
             println("Notify distro list: ${currentParams.testFlightNotifyDistroList}")
             println("Notes: ${currentParams.testFlightBuildNotes}")
-            println("File path: ${currentParams.filePath}")
+            println("File paths: ${currentParams.filePaths}")
             println("Replace: ${currentParams.testFlightReplace}")
 
             try {
@@ -92,7 +92,7 @@ class TestFlightTarget {
     String testFlightDistroList
     boolean testFlightNotifyDistroList
     String testFlightBuildNotes
-    String filePath
+    List<String> filePaths
     boolean testFlightReplace = true
 
     UploadRequest request() {
@@ -100,7 +100,7 @@ class TestFlightTarget {
                 teamToken: testFlightTeamToken,
                 buildNotes: testFlightBuildNotes,
                 distributionLists: testFlightDistroList,
-                file: new File(filePath),
+                filePaths: filePaths,
                 notifyDistributionList: testFlightNotifyDistroList,
                 replace: testFlightReplace)
     }

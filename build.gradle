@@ -111,6 +111,11 @@ install.repositories.mavenInstaller {
 // $ gradle assemble signArchives release
 
 uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri('repo'))
+//        }
+//    }
     repositories.mavenDeployer {
         if (signing.signatory) {
             beforeDeployment { signPom(it) }
